@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 import PropTypes from 'prop-types';
-import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps";
+import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
 
 
 class Map extends React.Component {
@@ -16,9 +16,12 @@ class Map extends React.Component {
                 {
                     markers.map((marker, index) =>
                         <Marker
-                            position={{ lat: marker.latitude, lng: marker.longitude }}
+                            position={{
+                                lat: marker.latitude,
+                                lng: marker.longitude
+                            }}
                             onClick={() => onMarkerClick(marker)}
-                            key={ "marker" + index }
+                            key={'marker' + index}
                         />
                     )
                 }
@@ -30,11 +33,14 @@ class Map extends React.Component {
 Map.propTypes = {
     markers: PropTypes.array.isRequired,
     onMarkerClick: PropTypes.func.isRequired,
-    center: PropTypes.object.isRequired
+    center: PropTypes.shape({
+        lat: PropTypes.number,
+        lng: PropTypes.number
+    }).isRequired
 };
 
 Map.defaultProps = {
-    center: {
+    center: {           // Atlanta's coordinates
         lat: 33.7490,
         lng: -84.3880
     }

@@ -1,80 +1,85 @@
-import React from "react";
+import React from 'react';
 import {  Typography, Paper, withStyles, List, AppBar, Toolbar, Button, InputBase } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 
-import Map from "../components/Map";
-import LocationElement from "../components/LocationElement";
-import LocationInfo from "../components/LocationInfo";
-import SearchInfo from "../components/SearchInfo";
+import Map from '../components/Map';
+import LocationElement from '../components/LocationElement';
+import LocationInfo from '../components/LocationInfo';
+import SearchInfo from '../components/SearchInfo';
 
-import firebase from "../firebase";
+import firebase from '../firebase';
 
 
 const styles = theme => ({
     floating: {
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         padding: 2 * theme.spacing.unit,
         zIndex: 1000,
-        pointerEvents: "none",
-        overflow: "hidden"
+        pointerEvents: 'none',
+        overflow: 'hidden'
     },
     title: {
-        width: "100%",
-        marginLeft: "auto",
-        marginRight: "auto",
+        width: '100%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
         padding: theme.spacing.unit
     },
+    appBar: {
+        height: '8%',
+        display: 'flex',
+        justifyContent: 'center'
+    },
     lowerInfo: {
-        width: "100%",
-        height: "100%",
-        marginTop: 2 * theme.spacing.unit,
-        display: "flex"
+        width: '100%',
+        height: '92%',
+        paddingTop: 2 * theme.spacing.unit,
+        display: 'flex'
     },
     listPaper: {
-        width: "30%",
-        height: "100%",
+        width: '30%',
+        height: '100%',
         marginRight: 4 * theme.spacing.unit
     },
     list: {
-        width: "100%",
-        height: "100%",
-        pointerEvents: "all",
-        overflowY: "auto"
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'all',
+        overflowY: 'auto'
     },
     loading: {
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center"
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     mapContainer: {
-        width: "100%",
-        height: "100%"
+        width: '100%',
+        height: '100%'
     },
     map: {
-        width: "100%",
-        height: "100%"
+        width: '100%',
+        height: '100%'
     },
     grow: {
         flexGrow: 1
     },
     signout: {
-        pointerEvents: "all"
+        pointerEvents: 'all'
     },
     search: {
-        display: "flex",
-        alignItems: "center",
-        pointerEvents: "all",
+        display: 'flex',
+        alignItems: 'center',
+        pointerEvents: 'all',
         borderRadius: theme.shape.borderRadius,
         marginRight: 2 * theme.spacing.unit,
         marginLeft: 0,
         '&:hover': {
-            background: "rgba(20, 20, 20, 0.5)",
+            background: 'rgba(20, 20, 20, 0.5)'
         }
     },
     searchIcon: {
@@ -97,20 +102,20 @@ class Home extends React.Component {
             places: [],
             showInfo: false,
             showSearch: false,
-            searchText: "",
-            searchTerm: "",
+            searchText: '',
+            searchTerm: '',
             selected: 0
         };
     }
 
     componentDidMount() {
-        firebase.database().ref('/locations/').once('value').then(function(snapshot) {
+        firebase.database().ref('/locations/').once('value').then((snapshot) => {
             const vals = snapshot.val();
 
             this.setState({
                 places: vals
             });
-        }.bind(this));
+        });
     }
 
     onMarkerClick = (info) => {
@@ -165,7 +170,7 @@ class Home extends React.Component {
                 <SearchIcon />
             </div>
             <InputBase
-                placeholder="Search Inventory"
+                placeholder='Search Inventory'
                 classes={{
                     root: classes.inputRoot
                 }}
@@ -179,13 +184,16 @@ class Home extends React.Component {
         return (
             <React.Fragment>
                 <div className={classes.floating}>
-                    <AppBar position="static">
+                    <AppBar
+                        position='static'
+                        className={classes.appBar}
+                    >
                         <Toolbar>
-                            <Typography variant="h6" color="inherit" className={classes.grow}>Donation Tracker</Typography>
+                            <Typography variant='h6' color='inherit' className={classes.grow}>Donation Tracker</Typography>
 
                             <Button
-                                variant="contained"
-                                color="default"
+                                variant='contained'
+                                color='default'
                                 className={classes.signout}
                                 onClick={() => firebase.auth().signOut()}
                             >Logout</Button>
@@ -194,22 +202,20 @@ class Home extends React.Component {
 
                     <div className={classes.lowerInfo}>
                         <Paper className={classes.listPaper}>
-                            <AppBar position="static">
+                            <AppBar position='static'>
                                 <Toolbar>
-                                    <Typography variant="h6" color="inherit" className={classes.grow}>Donation Centers</Typography>
+                                    <Typography variant='h6' color='inherit' className={classes.grow}>Donation Centers</Typography>
                                 </Toolbar>
                             </AppBar>
 
                             <List className={classes.list} disablePadding>
-                                {
-                                    Object.values(places).map((item, index) =>
-                                        <LocationElement
-                                            key={"item" + index}
-                                            onClick={this.onMarkerClick}
-                                            info={item}
-                                        />
-                                    )
-                                }
+                                {Object.values(places).map((item, index) =>
+                                    <LocationElement
+                                        key={'item' + index}
+                                        onClick={this.onMarkerClick}
+                                        info={item}
+                                    />
+                                )}
                             </List>
                         </Paper>
 
@@ -220,10 +226,10 @@ class Home extends React.Component {
                 </div>
 
                 <Map
-                    markers={Object.values(places)}
+                    markers={ Object.values(places) }
                     onMarkerClick={this.onMarkerClick}
                     isMarkerShown
-                    googleMapURL={"https://maps.googleapis.com/maps/api/js?key=" + process.env.REACT_APP_MAPS_KEY + "&v=3.exp&libraries=geometry,drawing,places"}
+                    googleMapURL={'https://maps.googleapis.com/maps/api/js?key=' + process.env.REACT_APP_MAPS_KEY + '&v=3.exp&libraries=geometry,drawing,places'}
                     loadingElement={<div className={classes.loading}><h3>Your map is now loading</h3></div>}
                     containerElement={<div className={classes.mapContainer} />}
                     mapElement={<div className={classes.map} />}

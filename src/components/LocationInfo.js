@@ -1,33 +1,31 @@
-import React from "react";
-import { Typography, Paper, IconButton, List, Button } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import List from '@material-ui/core/List';
+import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import { Close } from "@material-ui/icons";
+import CloseIcon from '@material-ui/icons/Close';
+import { withStyles } from '@material-ui/core/styles';
 
-import ItemElement from "./ItemElement";
-import NewItemDialog from "./NewItemDialog";
-import firebase from "../firebase";
+import ItemElement from './ItemElement';
+import NewItemDialog from './NewItemDialog';
+import firebase from '../firebase';
+import { formatters } from '../helpers';
 
 
 const styles = theme => ({
-    infoDialog: {
-        height: "100%",
-        flexGrow: 1,
-        pointerEvents: "all",
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 900
-    },
-    closeButton: {
-        pointerEvents: "all",
-        position: "absolute",
-        top: 0,
-        right: 0
-    },
     root: {
-        flexGrow: 1
+        height: '100%',
+        flexGrow: 1,
+        pointerEvents: 'all',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 900
     },
     grow: {
         flexGrow: 1
@@ -39,23 +37,24 @@ const styles = theme => ({
     content: {
         flexGrow: 1,
         padding: 2 * theme.spacing.unit,
-        display: "flex",
-        flexDirection: "column",
-        position: "relative"
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative'
     },
     itemListPaper: {
         marginTop: 3 * theme.spacing.unit,
-        width: "100%",
+        marginBottom: theme.spacing.unit,
+        width: '100%',
         flexGrow: 1
     },
     itemList: {
-        width: "100%",
-        height: "100%",
-        overflow: "auto"
+        width: '100%',
+        height: '100%',
+        overflow: 'auto'
     },
     addButton: {
-        alignSelf: "flex-end",
-        marginTop: theme.spacing.unit
+        alignSelf: 'flex-end',
+        marginTop: 'auto'
     }
 });
 
@@ -85,46 +84,46 @@ class LocationInfo extends React.Component {
     componentDidMount() {
         this.updateItems();
 
-        firebase.database().ref("users/" + firebase.auth().currentUser.uid + "/accountType/").once('value').then(function (snapshot) {
+        firebase.database().ref('users/' + firebase.auth().currentUser.uid + '/accountType/').once('value').then((snapshot) => {
             const vals = snapshot.val();
 
             this.setState({
                 accountType: vals
             });
-        }.bind(this));
+        });
     }
 
     updateItems = () => {
         const { info } = this.props;
 
-        firebase.database().ref("locations/" + info.name + "/inventory/").once('value').then(function (snapshot) {
+        firebase.database().ref('locations/' + info.name + '/inventory/').once('value').then((snapshot) => {
             const vals = snapshot.val();
 
-            if (vals) {
+            if (vals != null) {
                 this.setState({
                     inventory: Object.values(vals)
                 });
             }
-        }.bind(this));
+        });
     };
 
-    handleOpenNI = () => {
+    handleOpenNewItem = () => {
         this.setState({
             newOpen: true
         });
     };
 
-    handleCloseNI = () => {
+    handleCloseNewItem = () => {
         this.setState({
             newOpen: false
         });
     };
 
-    handleSubmitNI = async (values) => {
+    handleSubmitNewItem = async (values) => {
         const { info } = this.props;
 
         try {
-            await firebase.database().ref("locations/" + info.name + "/inventory/" + values.shortDescription).set(values);
+            await firebase.database().ref('locations/' + info.name + '/inventory/' + values.shortDescription).set(values);
         } catch (error) {
             alert(error);
         }
@@ -140,67 +139,75 @@ class LocationInfo extends React.Component {
         const { classes, info, closeInfo } = this.props;
         const { newOpen, inventory, accountType } = this.state;
 
-        /*
-            address: "309 EDGEWOOD AVE "
-            city: "Atlanta"
-            id: 1
-            inventory: Object { Jeans: {…}, "Phillies hat": {…}, "pink sweater": {…}, … }
-            latitude: 33.75416
-            longitude: -84.37742
-            name: "AFD Station 4"
-            phoneNumber: "(404) 555 - 3456"
-            state: "GA"
-            type: "Drop Off"
-            web: "www.afd04.atl.ga"
-            zip: 30332
-         */
+        const fullAddress = `${formatters.capitalizeWords(info.address)}, ${formatters.capitalizeWords(info.city)}, ${info.state.toUpperCase()} ${info.zip}`;
 
         return(
-            <Paper className={classes.infoDialog}>
-                <AppBar position="static">
+            <Paper className={classes.root}>
+                <AppBar position='static'>
                     <Toolbar>
-                        <Typography variant="h6" color="inherit" className={classes.grow}>{info.name}</Typography>
+                        <Typography variant='h6' color='inherit' className={classes.grow}>{info.name}</Typography>
                         <IconButton
                             className={classes.menuButton}
-                            color="inherit"
-                            aria-label="Close"
+                            color='inherit'
+                            aria-label='Close'
                             onClick={closeInfo}
                         >
-                            <Close />
+                            <CloseIcon />
                         </IconButton>
                     </Toolbar>
                 </AppBar>
 
                 <div className={classes.content}>
-                    <Typography variant="h6" color="inherit">Address: { info.address + ", " + info.city + ", " + info.state + " " + info.zip }</Typography>
-                    <Typography variant="h6" color="inherit">Website: { info.web }</Typography>
-                    <Typography variant="h6" color="inherit">Phone: { info.phoneNumber }</Typography>
-                    <Typography variant="h6" color="inherit">Location Type: { info.type }</Typography>
+                    <Typography variant='h6' color='inherit'>Address: { fullAddress }</Typography>
+                    <Typography variant='h6' color='inherit'>Website: { info.web }</Typography>
+                    <Typography variant='h6' color='inherit'>Phone: { formatters.phoneNumber(info.phoneNumber) }</Typography>
+                    <Typography variant='h6' color='inherit'>Location Type: { info.type }</Typography>
 
                     {(info.inventory != null) &&
                         <Paper className={classes.itemListPaper}>
                             <List className={classes.itemList} disablePadding>
                                 {inventory.map((item, index) =>
-                                    <ItemElement info={item} key={"itemElement" + index} />
+                                    <ItemElement info={item} key={'itemElement' + index} />
                                 )}
                             </List>
                         </Paper>
                     }
 
-                    {(accountType && accountType === "Location Employee") &&
+                    {(accountType && accountType === 'Location Employee') &&
                         <Button
-                            variant="contained"
-                            color="primary"
+                            variant='contained'
+                            color='primary'
                             className={classes.addButton}
-                            onClick={this.handleOpenNI}
+                            onClick={this.handleOpenNewItem}
                         >Add Item to Inventory</Button>
                     }
 
-                    <NewItemDialog location={info} open={newOpen} handleClose={this.handleCloseNI} handleSubmit={this.handleSubmitNI} />
+                    <NewItemDialog location={info} open={newOpen} handleClose={this.handleCloseNewItem} handleSubmit={this.handleSubmitNewItem} />
                 </div>
             </Paper>
         );
     }
 }
+
+LocationInfo.propTypes = {
+    info: PropTypes.shape({
+        address: PropTypes.string,      // '309 EDGEWOOD AVE '
+        city: PropTypes.string,         // 'Atlanta'
+        id: PropTypes.number,           // 1
+        inventory: PropTypes.object,    // { Jeans: {…}, 'Phillies hat': {…}, 'pink sweater': {…}, … }
+        latitude: PropTypes.number,     // 33.75416
+        longitude: PropTypes.number,    // -84.37742
+        name: PropTypes.string,         // 'AFD Station 4'
+        PhoneNumber: PropTypes.string,  // '(404) 555 - 3456'
+        state: PropTypes.string,        // 'GA'
+        type: PropTypes.string,         // 'Drop Off'
+        web: PropTypes.string,          // 'www.afd04.atl.ga'
+        zip: PropTypes.oneOfType([      // 30332
+            PropTypes.string,
+            PropTypes.number
+        ])
+    }).isRequired,
+    closeInfo: PropTypes.func.isRequired
+};
 
 export default withStyles(styles)(LocationInfo);

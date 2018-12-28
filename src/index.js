@@ -1,24 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import PrivateRoute from "./components/PrivateRoute";
-import app from "./firebase";
+import PrivateRoute from './components/PrivateRoute';
+import app from './firebase';
 
-import Home from "./pages/Home";
-import LogIn from "./pages/Login";
-import SignUp from "./pages/Signup";
+import Home from './pages/Home';
+import LogIn from './pages/Login';
+import SignUp from './pages/Signup';
 
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
 
 class App extends React.Component {
-    state = { loading: true, authenticated: false, user: null };
+    constructor(props) {
+        super(props);
 
-    componentWillMount() {
-        app.auth().onAuthStateChanged(user => {
+        this.state = {
+            loading: true,
+            authenticated: false,
+            user: null
+        };
+    }
+
+    componentDidMount() {
+        app.auth().onAuthStateChanged((user) => {
             if (user) {
                 this.setState({
                     authenticated: true,
@@ -38,9 +46,7 @@ class App extends React.Component {
     render() {
         const { authenticated, loading } = this.state;
 
-        if (loading) {
-            return <p>Loading..</p>;
-        }
+        if (loading) return <p>Loading...</p>;
 
         return (
             <Router>
@@ -48,12 +54,12 @@ class App extends React.Component {
                     <CssBaseline />
                     <PrivateRoute
                         exact
-                        path="/"
+                        path='/'
                         component={Home}
                         authenticated={authenticated}
                     />
-                    <Route exact path="/login" component={LogIn} />
-                    <Route exact path="/signup" component={SignUp} />
+                    <Route exact path='/login' component={LogIn} />
+                    <Route exact path='/signup' component={SignUp} />
                 </React.Fragment>
             </Router>
         );
